@@ -1,0 +1,257 @@
+<Page x:Class="FrozenWorld.Views.CustomerPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      Title="Customer Management"
+      Background="{StaticResource BrushBackground}"
+      FontFamily="{StaticResource FontFamilyApp}">
+
+    <!-- Page Loaded Fade-In Animation -->
+    <Page.Triggers>
+        <EventTrigger RoutedEvent="Page.Loaded">
+            <BeginStoryboard>
+                <Storyboard>
+                    <DoubleAnimation Storyboard.TargetProperty="Opacity"
+                                     From="0.0" To="1.0"
+                                     Duration="0:0:0.25">
+                        <DoubleAnimation.EasingFunction>
+                            <CubicEase EasingMode="EaseOut"/>
+                        </DoubleAnimation.EasingFunction>
+                    </DoubleAnimation>
+                </Storyboard>
+            </BeginStoryboard>
+        </EventTrigger>
+    </Page.Triggers>
+
+    <!-- Main Container with Consistent 24px Margin -->
+    <Grid Margin="24">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header Section -->
+        <Grid Grid.Row="0" Margin="0,0,0,20">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Page Title & Subtitle -->
+            <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                <Border Background="{StaticResource BrushPrimaryLight}"
+                        CornerRadius="6"
+                        Padding="8,3"
+                        HorizontalAlignment="Left"
+                        Margin="0,0,0,8">
+                    <TextBlock Text="CRM &amp; DIRECTORY"
+                               FontSize="11"
+                               FontWeight="Bold"
+                               Foreground="{StaticResource BrushPrimary}"/>
+                </Border>
+                <TextBlock Text="Customer Management"
+                           FontSize="24"
+                           FontWeight="Bold"
+                           Foreground="{StaticResource BrushTextPrimary}"/>
+                <TextBlock Text="Maintain customer profiles, contact numbers, and email communication records."
+                           FontSize="14"
+                           Foreground="{StaticResource BrushTextSecondary}"
+                           Margin="0,4,0,0"/>
+            </StackPanel>
+
+            <!-- Action Controls -->
+            <StackPanel Grid.Column="1"
+                        Orientation="Horizontal"
+                        VerticalAlignment="Center">
+                <Button x:Name="btnRefresh"
+                        Content="⟳ Refresh"
+                        Style="{StaticResource OutlineButton}"
+                        Margin="0,0,10,0"
+                        Click="BtnRefresh_Click"/>
+
+                <Button x:Name="btnAddCustomer"
+                        Content="+ Add Customer"
+                        Style="{StaticResource PrimaryButton}"
+                        Click="BtnAddCustomer_Click"/>
+            </StackPanel>
+        </Grid>
+
+        <!-- DataGrid inside Modern Card with Drop Shadow -->
+        <Border Grid.Row="1"
+                Background="{StaticResource BrushSurface}"
+                CornerRadius="14"
+                BorderBrush="{StaticResource BrushBorder}"
+                BorderThickness="1"
+                Effect="{StaticResource ShadowCard}">
+            <Grid>
+                <Border CornerRadius="14" ClipToBounds="True">
+                    <DataGrid x:Name="GridCustomers"
+                              Style="{StaticResource ModernDataGrid}">
+                        <DataGrid.Columns>
+                            <!-- ID -->
+                            <DataGridTextColumn Header="ID"
+                                                Binding="{Binding Id}"
+                                                Width="70"/>
+
+                            <!-- Name -->
+                            <DataGridTextColumn Header="CUSTOMER NAME"
+                                                Binding="{Binding Name}"
+                                                Width="*">
+                                <DataGridTextColumn.ElementStyle>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="FontWeight" Value="SemiBold"/>
+                                        <Setter Property="Foreground" Value="{StaticResource BrushTextPrimary}"/>
+                                        <Setter Property="VerticalAlignment" Value="Center"/>
+                                    </Style>
+                                </DataGridTextColumn.ElementStyle>
+                            </DataGridTextColumn>
+
+                            <!-- Email -->
+                            <DataGridTextColumn Header="EMAIL ADDRESS"
+                                                Binding="{Binding Email}"
+                                                Width="240">
+                                <DataGridTextColumn.ElementStyle>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="Foreground" Value="{StaticResource BrushTextSecondary}"/>
+                                        <Setter Property="VerticalAlignment" Value="Center"/>
+                                    </Style>
+                                </DataGridTextColumn.ElementStyle>
+                            </DataGridTextColumn>
+
+                            <!-- Phone Number Badge -->
+                            <DataGridTemplateColumn Header="PHONE NUMBER" Width="170">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Border Background="#F1F5F9"
+                                                CornerRadius="6"
+                                                Padding="8,4"
+                                                HorizontalAlignment="Left"
+                                                VerticalAlignment="Center">
+                                            <TextBlock Text="{Binding Phone}"
+                                                       FontSize="12"
+                                                       FontWeight="Medium"
+                                                       Foreground="{StaticResource BrushTextPrimary}"/>
+                                        </Border>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+
+                            <!-- Actions Column -->
+                            <DataGridTemplateColumn x:Name="colActions" Header="ACTIONS" Width="170">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <StackPanel Orientation="Horizontal"
+                                                    HorizontalAlignment="Center"
+                                                    VerticalAlignment="Center">
+                                            <Button Content="Edit"
+                                                    Style="{StaticResource GridEditButton}"
+                                                    Click="BtnEdit_Click"/>
+                                            <Button Content="Delete"
+                                                    Style="{DynamicResource GridDeleteButton}"
+                                                    Click="BtnDeleteCustomer_Click"/>
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </Border>
+
+                <!-- EMPTY STATE UI -->
+                <Border x:Name="panelEmptyState"
+                        Background="{StaticResource BrushSurface}"
+                        CornerRadius="14"
+                        Visibility="Collapsed"
+                        VerticalAlignment="Center"
+                        HorizontalAlignment="Center"
+                        Padding="40">
+                    <StackPanel HorizontalAlignment="Center">
+                        <Border Width="72" Height="72"
+                                CornerRadius="36"
+                                Background="{StaticResource BrushPrimaryLight}"
+                                BorderBrush="{StaticResource BrushPrimaryBorder}"
+                                BorderThickness="1"
+                                HorizontalAlignment="Center"
+                                Margin="0,0,0,16">
+                            <TextBlock Text="👥"
+                                       FontSize="32"
+                                       HorizontalAlignment="Center"
+                                       VerticalAlignment="Center"/>
+                        </Border>
+
+                        <TextBlock Text="No Customers Registered"
+                                   FontSize="18"
+                                   FontWeight="Bold"
+                                   Foreground="{StaticResource BrushTextPrimary}"
+                                   HorizontalAlignment="Center"
+                                   Margin="0,0,0,6"/>
+
+                        <TextBlock Text="Your customer directory is currently empty. Add your store's frequent shoppers and loyalty members."
+                                   FontSize="14"
+                                   Foreground="{StaticResource BrushTextMuted}"
+                                   HorizontalAlignment="Center"
+                                   TextAlignment="Center"
+                                   MaxWidth="360"
+                                   TextWrapping="Wrap"
+                                   Margin="0,0,0,20"/>
+
+                        <Button Content="+ Add Customer"
+                                Style="{StaticResource PrimaryButton}"
+                                HorizontalAlignment="Center"
+                                Padding="20,10"
+                                Click="BtnAddCustomer_Click"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- LOADING OVERLAY -->
+                <Grid x:Name="loadingOverlay"
+                      Background="#880F172A"
+                      Visibility="Collapsed">
+                    <Border Background="{StaticResource BrushSurface}"
+                            CornerRadius="14"
+                            Padding="32,24"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            Effect="{StaticResource ShadowElevated}">
+                        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                            <Canvas Width="44" Height="44" Margin="0,0,0,16" HorizontalAlignment="Center">
+                                <Ellipse Width="44" Height="44" Stroke="#E2E8F0" StrokeThickness="4"/>
+                                <Path Stroke="{StaticResource BrushPrimary}"
+                                      StrokeThickness="4"
+                                      StrokeStartLineCap="Round"
+                                      StrokeEndLineCap="Round"
+                                      Data="M 22 2 A 20 20 0 0 1 42 22">
+                                    <Path.RenderTransform>
+                                        <RotateTransform Angle="0" CenterX="22" CenterY="22"/>
+                                    </Path.RenderTransform>
+                                    <Path.Triggers>
+                                        <EventTrigger RoutedEvent="Loaded">
+                                            <BeginStoryboard>
+                                                <Storyboard RepeatBehavior="Forever">
+                                                    <DoubleAnimation Storyboard.TargetProperty="(Path.RenderTransform).(RotateTransform.Angle)"
+                                                                     From="0" To="360" Duration="0:0:0.85"/>
+                                                </Storyboard>
+                                            </BeginStoryboard>
+                                        </EventTrigger>
+                                    </Path.Triggers>
+                                </Path>
+                            </Canvas>
+
+                            <TextBlock x:Name="txtLoadingTitle"
+                                       Text="Loading Customers..."
+                                       FontSize="15"
+                                       FontWeight="Bold"
+                                       Foreground="{StaticResource BrushTextPrimary}"
+                                       HorizontalAlignment="Center"/>
+
+                            <TextBlock Text="Synchronizing with local API server"
+                                       FontSize="12"
+                                       Foreground="{StaticResource BrushTextMuted}"
+                                       HorizontalAlignment="Center"
+                                       Margin="0,4,0,0"/>
+                        </StackPanel>
+                    </Border>
+                </Grid>
+            </Grid>
+        </Border>
+    </Grid>
+</Page>

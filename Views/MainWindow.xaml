@@ -1,0 +1,201 @@
+<Window x:Class="FrozenWorld.Views.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Frozen World - SaaS Dashboard"
+        Height="720"
+        Width="1080"
+        MinHeight="600"
+        MinWidth="900"
+        WindowStartupLocation="CenterScreen"
+        Background="{StaticResource BrushBackground}"
+        FontFamily="{StaticResource FontFamilyApp}">
+
+    <Window.Resources>
+        <!-- Modern Sidebar Navigation Button Style -->
+        <Style x:Key="SidebarNavButton" TargetType="Button">
+            <Setter Property="Height" Value="44"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="#94A3B8"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="HorizontalContentAlignment" Value="Left"/>
+            <Setter Property="Padding" Value="14,0"/>
+            <Setter Property="Margin" Value="0,0,0,6"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="border"
+                                Background="{TemplateBinding Background}"
+                                CornerRadius="8"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter VerticalAlignment="Center"
+                                              HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#1E293B"/>
+                                <Setter Property="Foreground" Value="White"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <!-- Sleek Dark Sidebar -->
+            <ColumnDefinition Width="240"/>
+            <!-- Main Content Canvas -->
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- Modern Sidebar -->
+        <Border Grid.Column="0"
+                Background="{StaticResource BrushSidebar}"
+                BorderBrush="{StaticResource BrushSidebarBorder}"
+                BorderThickness="0,0,1,0">
+            <Grid Margin="18,20">
+                <Grid.RowDefinitions>
+                    <!-- Brand Section -->
+                    <RowDefinition Height="Auto"/>
+                    <!-- User Profile Card -->
+                    <RowDefinition Height="Auto"/>
+                    <!-- Navigation Links -->
+                    <RowDefinition Height="*"/>
+                    <!-- Logout Section -->
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <!-- Brand Header -->
+                <StackPanel Grid.Row="0" Margin="0,4,0,24">
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                        <Border Width="38" Height="38"
+                                CornerRadius="10"
+                                Background="#1E293B"
+                                BorderBrush="#334155"
+                                BorderThickness="1"
+                                Margin="0,0,12,0">
+                            <TextBlock Text="🍨"
+                                       FontSize="20"
+                                       HorizontalAlignment="Center"
+                                       VerticalAlignment="Center"/>
+                        </Border>
+                        <StackPanel VerticalAlignment="Center">
+                            <TextBlock Text="Frozen World"
+                                       Foreground="White"
+                                       FontSize="17"
+                                       FontWeight="Bold"/>
+                            <TextBlock Text="ICE CREAM ERP"
+                                       Foreground="#64748B"
+                                       FontSize="10"
+                                       FontWeight="Bold"
+                                       Margin="0,1,0,0"/>
+                        </StackPanel>
+                    </StackPanel>
+                </StackPanel>
+
+                <!-- User Profile Card -->
+                <Border Grid.Row="1"
+                        Background="#1E293B"
+                        CornerRadius="10"
+                        Padding="12"
+                        Margin="0,0,0,24">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <!-- Avatar Badge -->
+                        <Border Grid.Column="0"
+                                Width="34" Height="34"
+                                CornerRadius="17"
+                                Background="{StaticResource BrushPrimary}"
+                                Margin="0,0,10,0">
+                            <TextBlock x:Name="txtAvatarInitial"
+                                       Text="U"
+                                       Foreground="White"
+                                       FontWeight="Bold"
+                                       FontSize="14"
+                                       HorizontalAlignment="Center"
+                                       VerticalAlignment="Center"/>
+                        </Border>
+
+                        <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                            <TextBlock x:Name="txtUserName"
+                                       Text="Admin User"
+                                       Foreground="White"
+                                       FontSize="13"
+                                       FontWeight="SemiBold"
+                                       TextTrimming="CharacterEllipsis"/>
+                            <TextBlock x:Name="txtUserRole"
+                                       Text="ADMINISTRATOR"
+                                       Foreground="#94A3B8"
+                                       FontSize="10"
+                                       FontWeight="Bold"/>
+                        </StackPanel>
+                    </Grid>
+                </Border>
+
+                <!-- Navigation Links -->
+                <StackPanel Grid.Row="2">
+                    <TextBlock Text="MAIN MENU"
+                               Foreground="#475569"
+                               FontSize="10"
+                               FontWeight="Bold"
+                               Margin="8,0,0,10"/>
+
+                    <Button x:Name="btnInventory"
+                            Content="📦   Inventory Catalog"
+                            Style="{StaticResource SidebarNavButton}"
+                            Click="BtnInventory_Click"/>
+
+                    <Button x:Name="btnCustomers"
+                            Content="👥   Customers"
+                            Style="{StaticResource SidebarNavButton}"
+                            Click="BtnCustomers_Click"/>
+                </StackPanel>
+
+                <!-- Logout Button at Bottom -->
+                <Button x:Name="btnLogout"
+                        Grid.Row="3"
+                        Content="🚪   Log Out"
+                        Height="42"
+                        Background="#261E293B"
+                        Foreground="#EF4444"
+                        FontWeight="SemiBold"
+                        FontSize="13"
+                        BorderThickness="0"
+                        Cursor="Hand"
+                        Click="BtnLogout_Click">
+                    <Button.Template>
+                        <ControlTemplate TargetType="Button">
+                            <Border x:Name="border"
+                                    Background="{TemplateBinding Background}"
+                                    CornerRadius="8"
+                                    Padding="14,0">
+                                <ContentPresenter HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter TargetName="border" Property="Background" Value="#33EF4444"/>
+                                    <Setter Property="Foreground" Value="#F87171"/>
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Button.Template>
+                </Button>
+            </Grid>
+        </Border>
+
+        <!-- Main Content Area with Navigation Frame -->
+        <Frame x:Name="MainFrame"
+               Grid.Column="1"
+               NavigationUIVisibility="Hidden"
+               Background="{StaticResource BrushBackground}"/>
+    </Grid>
+</Window>

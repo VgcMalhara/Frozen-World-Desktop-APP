@@ -1,0 +1,398 @@
+<Page x:Class="FrozenWorld.Views.InventoryPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      Title="Inventory Management"
+      Background="{StaticResource BrushBackground}"
+      FontFamily="{StaticResource FontFamilyApp}">
+
+    <!-- Page Loaded Fade-In Animation -->
+    <Page.Triggers>
+        <EventTrigger RoutedEvent="Page.Loaded">
+            <BeginStoryboard>
+                <Storyboard>
+                    <DoubleAnimation Storyboard.TargetProperty="Opacity"
+                                     From="0.0" To="1.0"
+                                     Duration="0:0:0.25">
+                        <DoubleAnimation.EasingFunction>
+                            <CubicEase EasingMode="EaseOut"/>
+                        </DoubleAnimation.EasingFunction>
+                    </DoubleAnimation>
+                </Storyboard>
+            </BeginStoryboard>
+        </EventTrigger>
+    </Page.Triggers>
+
+    <!-- Main Page Container with Consistent 24px Padding -->
+    <Grid Margin="24">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header Section -->
+        <Grid Grid.Row="0" Margin="0,0,0,16">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Page Title & Subtitle -->
+            <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                <Border Background="{StaticResource BrushPrimaryLight}"
+                        CornerRadius="6"
+                        Padding="8,3"
+                        HorizontalAlignment="Left"
+                        Margin="0,0,0,8">
+                    <TextBlock Text="CATALOG &amp; STOCK"
+                               FontSize="11"
+                               FontWeight="Bold"
+                               Foreground="{StaticResource BrushPrimary}"/>
+                </Border>
+                <TextBlock Text="Inventory Management"
+                           FontSize="24"
+                           FontWeight="Bold"
+                           Foreground="{StaticResource BrushTextPrimary}"/>
+                <TextBlock Text="Manage ice cream flavors, update retail pricing, and monitor real-time stock levels."
+                           FontSize="14"
+                           Foreground="{StaticResource BrushTextSecondary}"
+                           Margin="0,4,0,0"/>
+            </StackPanel>
+
+            <!-- Header Action Controls -->
+            <StackPanel Grid.Column="1"
+                        Orientation="Horizontal"
+                        VerticalAlignment="Center">
+                <Button x:Name="btnRefresh"
+                        Content="⟳ Refresh"
+                        Style="{StaticResource OutlineButton}"
+                        Margin="0,0,10,0"
+                        Click="BtnRefresh_Click"/>
+
+                <Button x:Name="btnAddItem"
+                        Content="+ Add New Flavor"
+                        Style="{StaticResource SuccessButton}"
+                        Click="BtnAddItem_Click"/>
+            </StackPanel>
+        </Grid>
+
+        <!-- Search & Filter Toolbar -->
+        <Grid Grid.Row="1" Margin="0,0,0,16">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Search Box with Leading Icon and Trailing Clear Button -->
+            <Grid Grid.Column="0" Width="380">
+                <TextBox x:Name="txtSearch"
+                         Tag="Search by flavor name, category, or ID..."
+                         Style="{StaticResource ModernTextBox}"
+                         Padding="38,0,32,0"
+                         TextChanged="TxtSearch_TextChanged"/>
+                <!-- Search Icon -->
+                <TextBlock Text="🔍"
+                           FontSize="13"
+                           Foreground="{StaticResource BrushTextMuted}"
+                           VerticalAlignment="Center"
+                           HorizontalAlignment="Left"
+                           Margin="14,0,0,0"
+                           IsHitTestVisible="False"/>
+                <!-- Clear Button (✕) -->
+                <Button x:Name="btnClearSearch"
+                        Content="✕"
+                        Width="22" Height="22"
+                        FontSize="11"
+                        FontWeight="Bold"
+                        Foreground="{StaticResource BrushTextMuted}"
+                        Background="Transparent"
+                        BorderThickness="0"
+                        Cursor="Hand"
+                        HorizontalAlignment="Right"
+                        VerticalAlignment="Center"
+                        Margin="0,0,8,0"
+                        Visibility="Collapsed"
+                        Click="BtnClearSearch_Click">
+                    <Button.Template>
+                        <ControlTemplate TargetType="Button">
+                            <Border x:Name="clearBorder"
+                                    Background="{TemplateBinding Background}"
+                                    CornerRadius="11">
+                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter TargetName="clearBorder" Property="Background" Value="#E2E8F0"/>
+                                    <Setter Property="Foreground" Value="{StaticResource BrushTextPrimary}"/>
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Button.Template>
+                </Button>
+            </Grid>
+
+            <!-- Live Filter Results Counter -->
+            <TextBlock x:Name="txtSearchResults"
+                       Grid.Column="1"
+                       Text="Showing all items"
+                       FontSize="13"
+                       FontWeight="Medium"
+                       Foreground="{StaticResource BrushTextSecondary}"
+                       VerticalAlignment="Center"
+                       Margin="16,0,0,0"/>
+        </Grid>
+
+        <!-- Main Card Container with Drop Shadow & CornerRadius -->
+        <Border Grid.Row="2"
+                Background="{StaticResource BrushSurface}"
+                CornerRadius="14"
+                BorderBrush="{StaticResource BrushBorder}"
+                BorderThickness="1"
+                Effect="{StaticResource ShadowCard}">
+            <Grid>
+                <!-- Border Radius Clipping -->
+                <Border CornerRadius="14" ClipToBounds="True">
+                    <!-- Clean Borderless DataGrid -->
+                    <DataGrid x:Name="GridItems"
+                              Style="{StaticResource ModernDataGrid}">
+                        <DataGrid.Columns>
+                            <!-- ID -->
+                            <DataGridTextColumn Header="ID"
+                                                Binding="{Binding Id}"
+                                                Width="70"/>
+
+                            <!-- Item Name with SemiBold typography -->
+                            <DataGridTextColumn Header="FLAVOR NAME"
+                                                Binding="{Binding Name}"
+                                                Width="*">
+                                <DataGridTextColumn.ElementStyle>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="FontWeight" Value="SemiBold"/>
+                                        <Setter Property="Foreground" Value="{StaticResource BrushTextPrimary}"/>
+                                        <Setter Property="VerticalAlignment" Value="Center"/>
+                                    </Style>
+                                </DataGridTextColumn.ElementStyle>
+                            </DataGridTextColumn>
+
+                            <!-- Category Badge -->
+                            <DataGridTemplateColumn Header="CATEGORY" Width="180">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Border Background="#F1F5F9"
+                                                CornerRadius="6"
+                                                Padding="10,4"
+                                                HorizontalAlignment="Left"
+                                                VerticalAlignment="Center">
+                                            <TextBlock Text="{Binding Category}"
+                                                       FontSize="12"
+                                                       FontWeight="Medium"
+                                                       Foreground="{StaticResource BrushTextSecondary}"/>
+                                        </Border>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+
+                            <!-- Price -->
+                            <DataGridTextColumn Header="PRICE (RS)"
+                                                Binding="{Binding PriceString, StringFormat='Rs {0}'}"
+                                                Width="140">
+                                <DataGridTextColumn.ElementStyle>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="FontWeight" Value="SemiBold"/>
+                                        <Setter Property="Foreground" Value="{StaticResource BrushTextPrimary}"/>
+                                        <Setter Property="VerticalAlignment" Value="Center"/>
+                                    </Style>
+                                </DataGridTextColumn.ElementStyle>
+                            </DataGridTextColumn>
+
+                            <!-- Quantity in Stock -->
+                            <DataGridTemplateColumn Header="IN STOCK" Width="130">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                            <Ellipse Width="8" Height="8"
+                                                     Fill="{StaticResource BrushSuccess}"
+                                                     Margin="0,0,8,0"/>
+                                            <TextBlock Text="{Binding Quantity}"
+                                                       FontWeight="Bold"
+                                                       Foreground="{StaticResource BrushTextPrimary}"/>
+                                            <TextBlock Text=" units"
+                                                       FontSize="12"
+                                                       Foreground="{StaticResource BrushTextMuted}"
+                                                       Margin="3,1,0,0"/>
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+
+                            <!-- Actions Column: Modern Pill Edit & Delete -->
+                            <DataGridTemplateColumn x:Name="colActions" Header="ACTIONS" Width="170">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <StackPanel Orientation="Horizontal"
+                                                    HorizontalAlignment="Center"
+                                                    VerticalAlignment="Center">
+                                            <Button Content="Edit"
+                                                    Style="{StaticResource GridEditButton}"
+                                                    Click="BtnEdit_Click"/>
+                                            <Button Content="Delete"
+                                                    Style="{DynamicResource GridDeleteButton}"
+                                                    Click="BtnDeleteItem_Click"/>
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </Border>
+
+                <!-- EMPTY STATE UI (Shown when items count is 0 in database) -->
+                <Border x:Name="panelEmptyState"
+                        Background="{StaticResource BrushSurface}"
+                        CornerRadius="14"
+                        Visibility="Collapsed"
+                        VerticalAlignment="Center"
+                        HorizontalAlignment="Center"
+                        Padding="40">
+                    <StackPanel HorizontalAlignment="Center">
+                        <!-- Icon Circle -->
+                        <Border Width="72" Height="72"
+                                CornerRadius="36"
+                                Background="{StaticResource BrushPrimaryLight}"
+                                BorderBrush="{StaticResource BrushPrimaryBorder}"
+                                BorderThickness="1"
+                                HorizontalAlignment="Center"
+                                Margin="0,0,0,16">
+                            <TextBlock Text="🍨"
+                                       FontSize="34"
+                                       HorizontalAlignment="Center"
+                                       VerticalAlignment="Center"/>
+                        </Border>
+
+                        <TextBlock Text="No Inventory Items Found"
+                                   FontSize="18"
+                                   FontWeight="Bold"
+                                   Foreground="{StaticResource BrushTextPrimary}"
+                                   HorizontalAlignment="Center"
+                                   Margin="0,0,0,6"/>
+
+                        <TextBlock Text="Your inventory catalog is currently empty. Get started by adding your first ice cream flavor to stock."
+                                   FontSize="14"
+                                   Foreground="{StaticResource BrushTextMuted}"
+                                   HorizontalAlignment="Center"
+                                   TextAlignment="Center"
+                                   MaxWidth="360"
+                                   TextWrapping="Wrap"
+                                   Margin="0,0,0,20"/>
+
+                        <Button Content="+ Add First Flavor"
+                                Style="{StaticResource SuccessButton}"
+                                HorizontalAlignment="Center"
+                                Padding="20,10"
+                                Click="BtnAddItem_Click"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- SEARCH EMPTY STATE UI (Shown when search query has 0 matches) -->
+                <Border x:Name="panelSearchEmptyState"
+                        Background="{StaticResource BrushSurface}"
+                        CornerRadius="14"
+                        Visibility="Collapsed"
+                        VerticalAlignment="Center"
+                        HorizontalAlignment="Center"
+                        Padding="40">
+                    <StackPanel HorizontalAlignment="Center">
+                        <Border Width="64" Height="64"
+                                CornerRadius="32"
+                                Background="#F1F5F9"
+                                BorderBrush="{StaticResource BrushBorder}"
+                                BorderThickness="1"
+                                HorizontalAlignment="Center"
+                                Margin="0,0,0,14">
+                            <TextBlock Text="🔍"
+                                       FontSize="28"
+                                       HorizontalAlignment="Center"
+                                       VerticalAlignment="Center"/>
+                        </Border>
+
+                        <TextBlock Text="No Matching Flavors Found"
+                                   FontSize="17"
+                                   FontWeight="Bold"
+                                   Foreground="{StaticResource BrushTextPrimary}"
+                                   HorizontalAlignment="Center"
+                                   Margin="0,0,0,6"/>
+
+                        <TextBlock x:Name="txtSearchEmptyMsg"
+                                   Text="No items matched your search query. Try another keyword or clear the search."
+                                   FontSize="13"
+                                   Foreground="{StaticResource BrushTextMuted}"
+                                   HorizontalAlignment="Center"
+                                   TextAlignment="Center"
+                                   MaxWidth="360"
+                                   TextWrapping="Wrap"
+                                   Margin="0,0,0,18"/>
+
+                        <Button Content="Clear Search"
+                                Style="{StaticResource OutlineButton}"
+                                HorizontalAlignment="Center"
+                                Padding="16,8"
+                                Click="BtnClearSearch_Click"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- LOADING OVERLAY (Shown during API calls) -->
+                <Grid x:Name="loadingOverlay"
+                      Background="#880F172A"
+                      Visibility="Collapsed">
+                    <Border Background="{StaticResource BrushSurface}"
+                            CornerRadius="14"
+                            Padding="32,24"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            Effect="{StaticResource ShadowElevated}">
+                        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                            <!-- Pure XAML Smooth Rotating Ring -->
+                            <Canvas Width="44" Height="44" Margin="0,0,0,16" HorizontalAlignment="Center">
+                                <Ellipse Width="44" Height="44"
+                                         Stroke="#E2E8F0"
+                                         StrokeThickness="4"/>
+                                <Path Stroke="{StaticResource BrushPrimary}"
+                                      StrokeThickness="4"
+                                      StrokeStartLineCap="Round"
+                                      StrokeEndLineCap="Round"
+                                      Data="M 22 2 A 20 20 0 0 1 42 22">
+                                    <Path.RenderTransform>
+                                        <RotateTransform Angle="0" CenterX="22" CenterY="22"/>
+                                    </Path.RenderTransform>
+                                    <Path.Triggers>
+                                        <EventTrigger RoutedEvent="Loaded">
+                                            <BeginStoryboard>
+                                                <Storyboard RepeatBehavior="Forever">
+                                                    <DoubleAnimation Storyboard.TargetProperty="(Path.RenderTransform).(RotateTransform.Angle)"
+                                                                     From="0" To="360" Duration="0:0:0.85"/>
+                                                </Storyboard>
+                                            </BeginStoryboard>
+                                        </EventTrigger>
+                                    </Path.Triggers>
+                                </Path>
+                            </Canvas>
+
+                            <TextBlock x:Name="txtLoadingTitle"
+                                       Text="Fetching Inventory..."
+                                       FontSize="15"
+                                       FontWeight="Bold"
+                                       Foreground="{StaticResource BrushTextPrimary}"
+                                       HorizontalAlignment="Center"/>
+
+                            <TextBlock Text="Synchronizing with local API server"
+                                       FontSize="12"
+                                       Foreground="{StaticResource BrushTextMuted}"
+                                       HorizontalAlignment="Center"
+                                       Margin="0,4,0,0"/>
+                        </StackPanel>
+                    </Border>
+                </Grid>
+            </Grid>
+        </Border>
+    </Grid>
+</Page>

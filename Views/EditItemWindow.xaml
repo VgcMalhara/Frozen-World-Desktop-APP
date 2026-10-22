@@ -1,0 +1,195 @@
+<Window x:Class="FrozenWorld.Views.EditItemWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Edit Flavor - Frozen World"
+        Height="550"
+        Width="440"
+        WindowStartupLocation="CenterOwner"
+        Background="{StaticResource BrushBackground}"
+        FontFamily="{StaticResource FontFamilyApp}"
+        ResizeMode="NoResize">
+
+    <Grid>
+        <ScrollViewer VerticalScrollBarVisibility="Auto">
+            <StackPanel Margin="24">
+                <!-- Header with Icon Badge -->
+                <Grid Margin="0,0,0,20">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <Border Grid.Column="0"
+                            Width="44" Height="44"
+                            CornerRadius="12"
+                            Background="{StaticResource BrushSuccessLight}"
+                            BorderBrush="{StaticResource BrushSuccessBorder}"
+                            BorderThickness="1"
+                            Margin="0,0,14,0">
+                        <TextBlock Text="🍨"
+                                   FontSize="20"
+                                   HorizontalAlignment="Center"
+                                   VerticalAlignment="Center"/>
+                    </Border>
+
+                    <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                        <TextBlock Text="Edit Flavor Details"
+                                   FontSize="18"
+                                   FontWeight="Bold"
+                                   Foreground="{StaticResource BrushTextPrimary}"/>
+                        <TextBlock x:Name="txtItemId"
+                                   Text="Item ID: #--"
+                                   FontSize="12"
+                                   Foreground="{StaticResource BrushTextMuted}"
+                                   Margin="0,2,0,0"/>
+                    </StackPanel>
+                </Grid>
+
+                <!-- Flavor Name Field -->
+                <TextBlock Text="Flavor Name"
+                           FontWeight="SemiBold"
+                           FontSize="13"
+                           Foreground="{StaticResource BrushTextSecondary}"
+                           Margin="0,0,0,6"/>
+                <TextBox x:Name="txtName"
+                         Tag="e.g. Belgian Dark Chocolate"
+                         Style="{StaticResource ModernTextBox}"
+                         Margin="0,0,0,16"/>
+
+                <!-- Category Field -->
+                <TextBlock Text="Category"
+                           FontWeight="SemiBold"
+                           FontSize="13"
+                           Foreground="{StaticResource BrushTextSecondary}"
+                           Margin="0,0,0,6"/>
+                <TextBox x:Name="txtCategory"
+                         Tag="e.g. Classic Flavors, Sundaes, Sorbets"
+                         Style="{StaticResource ModernTextBox}"
+                         Margin="0,0,0,16"/>
+
+                <!-- Price and Quantity Grid -->
+                <Grid Margin="0,0,0,20">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="14"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <!-- Price -->
+                    <StackPanel Grid.Column="0">
+                        <TextBlock Text="Price (Rs)"
+                                   FontWeight="SemiBold"
+                                   FontSize="13"
+                                   Foreground="{StaticResource BrushTextSecondary}"
+                                   Margin="0,0,0,6"/>
+                        <TextBox x:Name="txtPrice"
+                                 Tag="e.g. 450.00"
+                                 Style="{StaticResource ModernTextBox}"/>
+                    </StackPanel>
+
+                    <!-- Quantity -->
+                    <StackPanel Grid.Column="2">
+                        <TextBlock Text="Quantity in Stock"
+                                   FontWeight="SemiBold"
+                                   FontSize="13"
+                                   Foreground="{StaticResource BrushTextSecondary}"
+                                   Margin="0,0,0,6"/>
+                        <TextBox x:Name="txtQuantity"
+                                 Tag="e.g. 50"
+                                 Style="{StaticResource ModernTextBox}"/>
+                    </StackPanel>
+                </Grid>
+
+                <!-- Inline Error Banner -->
+                <Border x:Name="borderError"
+                        Background="{StaticResource BrushDangerLight}"
+                        BorderBrush="{StaticResource BrushDangerBorder}"
+                        BorderThickness="1"
+                        CornerRadius="8"
+                        Padding="12,10"
+                        Margin="0,0,0,18"
+                        Visibility="Collapsed">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="⚠ "
+                                   Foreground="{StaticResource BrushDanger}"
+                                   FontWeight="Bold"/>
+                        <TextBlock x:Name="txtError"
+                                   Foreground="{StaticResource BrushDanger}"
+                                   FontSize="13"
+                                   TextWrapping="Wrap"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- Action Buttons -->
+                <Grid Margin="0,5,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="12"/>
+                        <ColumnDefinition Width="1.4*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <Button x:Name="btnCancel"
+                            Grid.Column="0"
+                            Content="Cancel"
+                            Height="42"
+                            Style="{StaticResource OutlineButton}"
+                            Click="BtnCancel_Click"/>
+
+                    <Button x:Name="btnSave"
+                            Grid.Column="2"
+                            Content="Update Flavor"
+                            Height="42"
+                            Style="{StaticResource SuccessButton}"
+                            Click="BtnSave_Click"/>
+                </Grid>
+            </StackPanel>
+        </ScrollViewer>
+
+        <!-- Modern Loading Overlay -->
+        <Grid x:Name="loadingOverlay"
+              Background="#990F172A"
+              Visibility="Collapsed">
+            <Border Background="{StaticResource BrushSurface}"
+                    CornerRadius="14"
+                    Padding="28,20"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    Effect="{StaticResource ShadowElevated}">
+                <StackPanel HorizontalAlignment="Center">
+                    <Canvas Width="36" Height="36" Margin="0,0,0,12" HorizontalAlignment="Center">
+                        <Ellipse Width="36" Height="36" Stroke="#E2E8F0" StrokeThickness="3.5"/>
+                        <Path Stroke="{StaticResource BrushSuccess}"
+                              StrokeThickness="3.5"
+                              StrokeStartLineCap="Round"
+                              StrokeEndLineCap="Round"
+                              Data="M 18 2 A 16 16 0 0 1 34 18">
+                            <Path.RenderTransform>
+                                <RotateTransform Angle="0" CenterX="18" CenterY="18"/>
+                            </Path.RenderTransform>
+                            <Path.Triggers>
+                                <EventTrigger RoutedEvent="Loaded">
+                                    <BeginStoryboard>
+                                        <Storyboard RepeatBehavior="Forever">
+                                            <DoubleAnimation Storyboard.TargetProperty="(Path.RenderTransform).(RotateTransform.Angle)"
+                                                             From="0" To="360" Duration="0:0:0.8"/>
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </EventTrigger>
+                            </Path.Triggers>
+                        </Path>
+                    </Canvas>
+                    <TextBlock Text="Updating Item..."
+                               FontSize="14"
+                               FontWeight="Bold"
+                               Foreground="{StaticResource BrushTextPrimary}"
+                               HorizontalAlignment="Center"/>
+                    <TextBlock Text="Saving changes to database"
+                               FontSize="12"
+                               Foreground="{StaticResource BrushTextMuted}"
+                               HorizontalAlignment="Center"
+                               Margin="0,2,0,0"/>
+                </StackPanel>
+            </Border>
+        </Grid>
+    </Grid>
+</Window>
